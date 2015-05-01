@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+		<param name="Threshold" value="DEBUG" />
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{DATE} %-5p %c %x - %m%n" />
+		</layout>
+	</appender>
+	<appender name="file" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="skapservice.log" />
+		<param name="Append" value="true" />
+		<!-- Roll over at midnight each day -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{DATE} %-5p %c - %m%n" />
+		</layout>
+	</appender>
+	<!-- Set the log levels for specific packages if they are to be something 
+		other than INFO. For more verbose logging change INFO to DEBUG. For production 
+		all log levels must be set to INFO or higher. -->
+	<!-- File appender to be used if want to redirect the log to file -->
+	<logger name="com">
+		<level value="INFO" />
+	</logger>
+	<logger name="org">
+		<level value="INFO" />
+	</logger>
+	<logger name="com.skap">
+		<level value="DEBUG" />
+	</logger>
+	<root>
+		<priority value="DEBUG" />
+		<appender-ref ref="file" />
+		<appender-ref ref="stdout" />
+	</root>
+</log4j:configuration>
