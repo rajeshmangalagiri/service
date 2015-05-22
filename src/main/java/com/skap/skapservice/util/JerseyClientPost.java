@@ -17,9 +17,9 @@ public class JerseyClientPost {
 			Client client = ClientBuilder.newClient();
 
 			WebTarget webTarget = client
-					.target("http://localhost:8080/skapservice/users/ValidateUserID");
+					.target("http://localhost:8080/skapservice/users/saveUserDefinition");
 
-			String input = "{\"userID\":\"123@aihhl.com\",\"aKey\":\"75974f563ed9d6da6a33b63c2fb16fe359d29bdd\"}";
+			String input = "{\"userID\":\"123@asm.com\",\"password\":\"f089eda53eff2b17ca9b385c11425b278c770509\"}";
 			
 			;
 			

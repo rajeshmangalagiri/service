@@ -18,6 +18,7 @@ import com.skap.skapservice.model.dto.UserDefinition;
 import com.skap.skapservice.model.dto.UserDefinitionDto;
 import com.skap.skapservice.model.dto.UserResponseDto;
 import com.skap.skapservice.util.ErrorCodes;
+import com.skap.skapservice.util.SkapServiceConstants;
 import com.skap.skapservice.util.SkapUtility;
 
 /**
@@ -25,7 +26,7 @@ import com.skap.skapservice.util.SkapUtility;
  * 
  */
 @Component
-public class SkapServiceImpl implements SkapService {
+public class SkapServiceImpl implements SkapService, SkapServiceConstants {
 
 	private static final Logger log = Logger.getLogger(SkapServiceImpl.class
 			.getName());
@@ -47,14 +48,26 @@ public class SkapServiceImpl implements SkapService {
 		UserDefinition user = skapServiceDao.getUserDetails(userDefinition
 				.getUserID());
 		log.info("After fetching the User in SaveUserDefinition");
-		if (null == user || StringUtils.isBlank(user.getUserID())) {
+		if ((null == user || StringUtils.isBlank(user.getUserID()))
+				&& INACTIVE.equalsIgnoreCase(userDefinition.getAccountStatus())) {
 			skapServiceDao.saveUserDefinition(userDefinition);
+		} else if ((null == user || StringUtils.isBlank(user.getUserID()))
+				&& ACTIVE.equalsIgnoreCase(userDefinition.getAccountStatus())) {
+			userResponseDto.setResponseCode(ErrorCodes.USER_INVLID
+					.getErrorCode());
+			userResponseDto.setResponseMessage(ErrorCodes.USER_INVLID
+					.getErrorMessage());
+		} else if (ACTIVE.equalsIgnoreCase(userDefinition.getAccountStatus())) {
+			user.setPassword(userDefinition.getPassword());
+			user.setAccountStatus(userDefinition.getAccountStatus());
+			user.setLastUpdedTime(new Date());
+			user.setLastUpdatedBy(userDefinition.getUserID());
+			skapServiceDao.updateUserDefinition(user);
 			log.info("In Service after DAO");
 			userResponseDto.setResponseCode(ErrorCodes.SUCCESS.getErrorCode());
 			userResponseDto.setResponseMessage(ErrorCodes.SUCCESS
 					.getErrorMessage());
-		} else {
-			log.info("User already exists" + user.getUserID());
+		} else if (INACTIVE.equalsIgnoreCase(userDefinition.getAccountStatus())) {
 			userResponseDto.setResponseCode(ErrorCodes.USER_EXISTS
 					.getErrorCode());
 			userResponseDto.setResponseMessage(ErrorCodes.USER_EXISTS
@@ -133,19 +146,20 @@ public class SkapServiceImpl implements SkapService {
 		UserResponseDto responseDto = new UserResponseDto();
 		UserDefinition user = skapServiceDao.getUserDetails(userDefinitionDto
 				.getUserID());
-		String password = skapUtility.ShaHexCode(userDefinitionDto
+		String password = SkapUtility.ShaHexCode(userDefinitionDto
 				.getPassword() + user.getPKey());
 		if (userDefinitionDto.getUserID().equalsIgnoreCase(user.getUserID())
-				&& password.equalsIgnoreCase(user.getPassword())) {
+				&& password.equalsIgnoreCase(user.getPassword())
+				&& ACTIVE.equalsIgnoreCase(user.getAccountStatus())) {
 			log.info("In Service validateUserID: after DAO");
 			responseDto.setResponseCode(ErrorCodes.SUCCESS.getErrorCode());
 			responseDto
 					.setResponseMessage(ErrorCodes.SUCCESS.getErrorMessage());
-			String passwordKey = skapUtility.ShaHexCode();
-			responseDto.setshaKey(passwordKey);
-			user.setPKey(passwordKey);
-			user.setLastUpdedTime(new Date());
-			skapServiceDao.updateUserDefinition(user);
+		} else if (INACTIVE.equalsIgnoreCase(user.getAccountStatus())) {
+			responseDto
+					.setResponseCode(ErrorCodes.USER_INACTIVE.getErrorCode());
+			responseDto.setResponseMessage(ErrorCodes.USER_INACTIVE
+					.getErrorMessage());
 		} else {
 			responseDto
 					.setResponseCode(ErrorCodes.INVALID_LOGIN.getErrorCode());

@@ -70,8 +70,7 @@ public class SkapServiceEndPointImpl implements SkapServiceEndPoint,
 			userDefinition.setUserID(userDefinitionDto.getUserID());
 			userDefinition.setPassword(userDefinitionDto.getPassword());
 			userDefinition.setAccountStatus(ACTIVE);
-			userDefinition.setLastUpdedTime(new Date());
-			userDefinition.setLastUpdatedBy(userDefinitionDto.getUserID());
+			
 			skapService.SaveUserDefinition(userDefinition);
 
 		} catch (SkapServiceException e) {
@@ -222,7 +221,7 @@ public class SkapServiceEndPointImpl implements SkapServiceEndPoint,
 				throw new SkapServiceException(ErrorCodes.VALIDATION_ERROR);
 			}
 			response = skapService
-					.getUserDetails(userDefinitionDto.getUserID());
+					.validateLogin(userDefinitionDto);
 		} catch (SkapServiceException e) {
 			log.severe("ERROR: SkapServiceEndPointImpl.SaveUserDefinition"
 					+ e.getMessage());

@@ -15,7 +15,8 @@ public enum ErrorCodes {
 	VALIDATION_ERROR(2001,"Invalid Request"),
 	INVALID_LOGIN(2002,"Invalid UserID/Password"),
 	USER_EXISTS(2003,"User Already Exists"),
-	USER_INVLID(2004,"Not a VALID User");
+	USER_INACTIVE(2004,"User is not Active"),
+	USER_INVLID(2005,"Not a VALID User");
 	
 	private int errorCode;
 	
